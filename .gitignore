@@ -1,0 +1,5 @@
+bin/dict.exe
+bin/dict
+build/HashTable.o
+build/TestTable.o
+build/main.o
