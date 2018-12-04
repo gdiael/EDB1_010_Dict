@@ -73,7 +73,17 @@ HashTable::~HashTable()
  */
 string HashTable::get(const string key)
 {
-    throw "NOT YET IMPLEMENTED";
+    unsigned long i = this->hash(key);
+    long d = 1;
+    while(this->data[i] != nullptr && d < this->size){
+        if(this->data[i] == ENTRY_DELETED){
+            // pular as entradas removidas para evitar erro na chamada do if
+        }else if(this->data[i]->getKey() == key){
+            return this->data[i]->getValue();
+        };
+        i = (this->hash(key) + d++) % this->size;
+    };
+    return "";
 }
 
 /**
@@ -82,7 +92,33 @@ string HashTable::get(const string key)
  */
 bool HashTable::put(const string key, const string value)
 {
-    throw "NOT YET IMPLEMENTED";
+    if(this->isFull()){
+        cout << "Esta cheio! Nao eh possivel adicionar nada." << endl;
+        return false;
+    };
+    unsigned long i = this->hash(key);
+    long d = 1;
+    long wasRemoved = -1;
+    while(this->data[i] != nullptr && d < this->size){
+        if(wasRemoved == -1 && this->data[i] == ENTRY_DELETED){
+            wasRemoved = i;
+        }else if(this->data[i]->getKey() == key){
+            this->data[i]->setValue(value);
+            return true;
+        };
+        i = (this->hash(key) + d++) % this->size;
+    };
+    if(wasRemoved != -1){
+        d = (d >= this->size ? this->size-1 : d); // verificar caso o vetor não tenha entradas nulas, mas tenha entradas removidas
+        i = wasRemoved;
+    };
+    if(d < this->size){
+        HashEntry<std::string, std::string> *newEntry = new HashEntry<std::string,std::string>(key, value);
+        this->data[i] = newEntry;
+        this->quantity++;
+        return true;
+    };
+    return false;
 }
 
 /**
@@ -91,7 +127,19 @@ bool HashTable::put(const string key, const string value)
  */
 bool HashTable::remove(const string key)
 {
-    throw "NOT YET IMPLEMENTED";
+    unsigned long i = this->hash(key);
+    long d = 1;
+    while(this->data[i] != nullptr && d < this->size){
+        if(this->data[i] == ENTRY_DELETED){
+            // pular as entradas removidas para evitar erro na chamada do if
+        }else if(this->data[i]->getKey() == key){
+            this->data[i] = ENTRY_DELETED;
+            this->quantity--;
+            return true;
+        };
+        i = (this->hash(key) + d++) % this->size;
+    };
+    return false;
 }
 
 /**
